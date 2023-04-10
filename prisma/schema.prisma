@@ -1,0 +1,138 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
+}
+
+///
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+///
+model Message {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  inWindow  Boolean
+  message   String
+  type      String
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+///
+model Randomization {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  message     String
+  messageType String
+  messageTime Int
+  userId      String
+  User        User     @relation(fields: [userId], references: [id])
+}
+
+///
+model Ema {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  set       String
+  responses Json
+  complete  Boolean  @default(false)
+  prompt    String   @default("unknown")
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+///
+model Rating {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  exercise  String
+  rating    String
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+///
+model EmaIncompleteAlert {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  seen      Boolean  @default(false)
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+///
+model WatchBatteryAlert {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  seen      Boolean  @default(false)
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+///
+model TimelineAlert {
+  id            Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  seen          Boolean  @default(false)
+  daysInStudy   Int
+  setsCompleted Int      @default(0)
+  userId        String
+  User          User     @relation(fields: [userId], references: [id])
+}
+
+///
+model Progress {
+  id                     Int      @id @default(autoincrement())
+  createdAt              DateTime @default(now())
+  totalMinMeditating     Float?
+  totalSessions          Int?
+  hoursSinceLastPractice Int?
+  updatedByServer        Boolean? @default(false)
+  userId                 String
+  user                   User     @relation(fields: [userId], references: [id])
+}
+
+///
+model Screen {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  screen    String
+  userId    String
+  User      User     @relation(fields: [userId], references: [id])
+}
+
+///
+model User {
+  id                      String               @id @default(uuid())
+  username                String               @unique
+  password                String
+  pushToken               String?
+  window                  Json
+  randomizedToday         Boolean              @default(false)
+  messageSentToday        Boolean              @default(false)
+  emaOneSentToday         Boolean              @default(false)
+  emaTwoSentToday         Boolean              @default(false)
+  inWindowToday           Boolean              @default(false)
+  messageTypeToday        String               @default("none")
+  messageToday            String               @default("")
+  admin                   Boolean              @default(false)
+  emaOneOpenedToday       Boolean              @default(false)
+  emaOneCompletedToday    Boolean              @default(false)
+  emaTwoCompletedToday    Boolean              @default(false)
+  daysInStudy             Int                  @default(0)
+  messageTimeToday        Int                  @default(0)
+  emaOneReminderSentToday Boolean              @default(false)
+  emaTwoReminderSentToday Boolean              @default(false)
+  emaTwoOpenedToday       Boolean              @default(false)
+  ema                     Ema[]
+  EmaIncompleteAlert      EmaIncompleteAlert[]
+  messages                Message[]
+  progress                Progress[]
+  randomization           Randomization[]
+  ratings                 Rating[]
+  screens                 Screen[]
+  TimelineAlert           TimelineAlert[]
+  WatchBatteryAlert       WatchBatteryAlert[]
+}

@@ -1,0 +1,12 @@
+# environment
+.env
+.env.*
+
+# serverless
+.serverless/
+
+# node.js
+#
+node_modules/
+npm-debug.log
+yarn-error.log
